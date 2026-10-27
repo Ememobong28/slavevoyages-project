@@ -69,5 +69,5 @@ def my_model(task):
 | `analysis/` | why nationality is easy to predict, and the training-share sweep |
 | `eval_pipeline.py`, `column_audit_276.csv`, `codebook_maps.json` | metrics, the column audit, codebook labels |
 
-## Licence
-MIT (see `LICENSE`). The data is not included and has its own terms.
+## License
+To be decided. Until a license is added, all rights are reserved and the code may not be reused. The data is not included and has its own terms.

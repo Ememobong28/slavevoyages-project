@@ -26,3 +26,4 @@ Collected as they come up. Newest at the bottom. Mark each one answered when it 
 ## Decisions I made that need a yes/no
 - "Imputed" mode keeps recorded values untouched and only fills gaps. Agree?
 - Targets for the first round: nationality (grouped to the 8 imputed-style groups) and tonnage. Which should come next?
+- **License and ownership.** May the code be made public, and under which license? Does Rice or the project have a policy for research code?
