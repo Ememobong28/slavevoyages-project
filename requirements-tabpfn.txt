@@ -1,0 +1,2 @@
+# optional: only needed for the 'tabpfn' model (best on a GPU, e.g. a free Colab T4)
+tabpfn>=2.5

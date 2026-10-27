@@ -1,0 +1,11 @@
+# data is NOT stored in this repo: see DATA.md
+tastdb-exp-2019.csv
+data/*
+!data/README.md
+*.sqlite
+*.gz
+voyages_flat_*.csv
+results/*.parquet
+__pycache__/
+.ipynb_checkpoints/
+.DS_Store
