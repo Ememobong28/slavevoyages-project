@@ -12,7 +12,7 @@ It does three things:
 
 ## Try it (5 minutes)
 ```bash
-git clone <this repo> && cd slavevoyages-project
+git clone https://github.com/Ememobong28/slavevoyages-project && cd slavevoyages-project
 pip install -r requirements.txt
 # put tastdb-exp-2019.csv in this folder (see DATA.md)
 python voyage_db.py sqlite tastdb-exp-2019.csv voyages.sqlite     # build the database (about 20 MB)
