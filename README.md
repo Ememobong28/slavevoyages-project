@@ -16,7 +16,7 @@ git clone https://github.com/Ememobong28/slavevoyages-project && cd slavevoyages
 pip install -r requirements.txt
 # put tastdb-exp-2019.csv in this folder (see DATA.md)
 python voyage_db.py sqlite tastdb-exp-2019.csv voyages.sqlite     # build the database (about 20 MB)
-python tests/test_framework.py                                    # 8 checks
+python tests/test_framework.py                                    # 9 checks
 python run_experiment.py --csv voyages.sqlite --target NATIONAL_GROUP --mode real --train-frac 0.5
 ```
 
@@ -31,6 +31,8 @@ print(pd.read_sql("""
   SELECT l.label AS nationality, COUNT(*) AS voyages
   FROM voyages_real v JOIN category_labels l ON l.column_name = 'NATIONAL' AND l.code = v.NATIONAL
   GROUP BY 1 ORDER BY 2 DESC LIMIT 5""", con))
+# or let the readable view do the join for you:
+print(pd.read_sql("SELECT NATIONAL, PORTDEP, RIG FROM voyages_imputed_readable LIMIT 5", con))
 ```
 More worked examples, including switching between real and imputed, are in `QUERIES.md`. Any SQLite tool works (DB Browser for SQLite, DBeaver, the `sqlite3` command, R, DuckDB).
 
@@ -40,6 +42,7 @@ More worked examples, including switching between real and imputed, are in `QUER
 | `voyages` | All 276 original columns, cleaned. Missing is `NULL`. |
 | `voyages_real` (view) | Only values the sources recorded. Imputed columns are `NULL`. |
 | `voyages_imputed` (view) | Recorded value where there is one, otherwise the imputed value. |
+| `voyages_real_readable`, `voyages_imputed_readable` (views) | The same two tables with coded columns shown as names (Great Britain, Rio de Janeiro, Brig, ...). A code the codebook does not define shows as `(undefined code N)`. |
 | `imputation_map` | Which imputed column fills which recorded column, with a confidence note. |
 | `column_audit` | Keep / reshape / defer / exclude for all 276 columns, with the reason. |
 | `category_labels`, `place_labels` | Code to label tables from the codebook. |

@@ -107,3 +107,16 @@ MAJSELPT        MAJSELPT      MJSLPTIMP       high
  SLAXIMP        TSLAVESD        SLAXIMP        low
  SLAMIMP        SLAARRIV        SLAMIMP        low
 ```
+
+## Readable view: names instead of codes
+```sql
+SELECT VOYAGEID, NATIONAL, RIG, PORTDEP, ARRPORT, FATE FROM voyages_imputed_readable LIMIT 5;
+```
+Result (first rows, imputed mode):
+
+```
+ VOYAGEID NATIONAL       RIG                 PORTDEP                 ARRPORT  FATE
+        1 Portugal  Bergantim          Rio de Janeiro Bahia, port unspecified  Sold slaves in Americas - subsequent fate unknown
+        2     NULL  Bergantim Bahia, port unspecified                    NULL  Voyage completed as intended
+```
+Use `voyages_real_readable` for recorded values only. Undefined codes show as `(undefined code N)`.

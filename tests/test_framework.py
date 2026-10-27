@@ -83,6 +83,22 @@ def test_sql_views_match_python():
     assert len(res) == 2
     ok('the SQL views (voyages_real / voyages_imputed) give exactly the same tables as the Python code, and experiments run from the .sqlite file')
 
+def test_readable_views():
+    import tempfile, os, sqlite3
+    path = os.path.join(tempfile.mkdtemp(), 'v.sqlite'); voyage_db.build_sqlite('tastdb-exp-2019.csv', path)
+    con = sqlite3.connect(path)
+    for mode in voyage_db.MODES:
+        n_num = con.execute(f'SELECT COUNT(*) FROM voyages_{mode}').fetchone()[0]
+        n_read = con.execute(f'SELECT COUNT(*) FROM voyages_{mode}_readable').fetchone()[0]
+        assert n_num == n_read == len(BASE)
+    gb = con.execute("SELECT COUNT(*) FROM voyages_real_readable WHERE NATIONAL = 'Great Britain'").fetchone()[0]
+    assert gb == int((BASE['NATIONAL'] == 7).sum()), 'label counts must equal code counts'
+    und = con.execute("SELECT COUNT(*) FROM voyages_real_readable WHERE NATIONAL LIKE '(undefined code%'").fetchone()[0]
+    assert und == 21, und        # the 21 voyages with NATIONAL codes 3 and 6 that the codebook does not define
+    nulls = con.execute("SELECT COUNT(*) FROM voyages_real_readable WHERE NATIONAL IS NULL").fetchone()[0]
+    assert nulls == int(BASE['NATIONAL'].isna().sum()), 'missing must stay missing, not become a label'
+    ok('readable views: same rows, label counts equal code counts, undefined codes are flagged, missing stays NULL')
+
 if __name__ == '__main__':
     for n, f in list(globals().items()):
         if n.startswith('test_'): f()

@@ -31,6 +31,11 @@ IMPUTATION_MAP = {
 # NATIONAL needs a crosswalk: NATINIMP uses coarser groups than NATIONAL.
 NATIONAL_TO_GROUP = {1:3, 2:3, 3:3, 4:6, 5:6, 6:6, 7:7, 8:8, 9:9, 10:10,
                      11:15, 12:15, 13:15, 14:15, 16:30, 17:30, 18:30, 19:30, 24:30, 25:30}
+# place/port/region columns whose values are 5-digit geographic codes (labels in place_labels)
+GEO_COLUMNS = ['PLACCONS','CONSTREG','PLACREG','REGISREG','PORTDEP','EMBPORT','EMBPORT2','EMBREG','EMBREG2','ARRPORT','ARRPORT2',
+               'REGARR','REGARR2','PLAC1TRA','PLAC2TRA','PLAC3TRA','REGEM1','REGEM2','REGEM3','SLA1PORT','ADPSALE1','ADPSALE2',
+               'REGDIS1','REGDIS2','REGDIS3','PORTRET','RETRNREG','RETRNREG1','DEPTREGIMP','DEPTREGIMP1','MAJBUYPT','MAJSELPT',
+               'PTDEPIMP','MJBYPTIMP','MAJBYIMP','MAJBYIMP1','MJSLPTIMP','MJSELIMP','MJSELIMP1']
 # imputed-only columns with no recorded twin; present in 'imputed' mode, UNKNOWN in 'real' mode
 IMPUTED_ONLY = ['MAJBYIMP', 'MAJBYIMP1', 'MJSELIMP', 'MJSELIMP1', 'TONMOD']
 
@@ -124,12 +129,34 @@ def _sql_views(columns):
     return {m: f'CREATE VIEW voyages_{m} AS SELECT\n  {select(m)}\nFROM voyages;' for m in MODES}
 
 
+def _readable_views(columns, categorical):
+    """voyages_<mode>_readable: same rows as the numeric view, coded columns shown as labels.
+    A code the codebook does not define shows as '(undefined code N)'; NULL stays NULL."""
+    q = lambda c: f'"{c}"'
+    def expr(c, table, where):
+        code = f'CAST(v.{q(c)} AS INTEGER)'
+        return (f"COALESCE((SELECT label FROM {table} WHERE {where} AND code = {code}), "
+                f"CASE WHEN v.{q(c)} IS NULL THEN NULL ELSE '(undefined code ' || {code} || ')' END) AS {q(c)}")
+    cols = list(columns) + ['NATIONAL_GROUP']; out = {}
+    for m in MODES:
+        parts = []
+        for c in cols:
+            if c == 'NATIONAL_GROUP': parts.append(expr(c, 'category_labels', "column_name = 'NATINIMP'"))   # same 8 groups
+            elif c in categorical: parts.append(expr(c, 'category_labels', f"column_name = '{c}'"))
+            elif c in GEO_COLUMNS: parts.append(expr(c, 'place_labels', '1 = 1'))
+            else: parts.append(f'v.{q(c)}')
+        out[m] = f'CREATE VIEW voyages_{m}_readable AS SELECT\n  ' + ',\n  '.join(parts) + f'\nFROM voyages_{m} v;'
+    return out
+
+
 def build_sqlite(csv='tastdb-exp-2019.csv', path='voyages.sqlite', audit='column_audit_276.csv', maps='codebook_maps.json'):
     """
     Build ONE SQLite file you can open in any SQL tool (DB Browser, DBeaver, sqlite3, pandas, R, DuckDB).
       voyages           every original column, cleaned; missing = NULL (SQL's own "unknown"); original CSV untouched
       voyages_real      VIEW: recorded values only
       voyages_imputed   VIEW: recorded values, gaps filled with imputed values
+      voyages_real_readable / voyages_imputed_readable
+                        VIEWS: the same, with coded columns shown as labels (Great Britain, Rio de Janeiro, ...)
       imputation_map    which imputed column fills which recorded column, and how sure the pairing is
       column_audit      the keep/reshape/defer/exclude decision and reason for each of the 276 columns
       category_labels   code -> label for the coded columns (nationality, rig, fate, ...)
@@ -153,6 +180,8 @@ def build_sqlite(csv='tastdb-exp-2019.csv', path='voyages.sqlite', audit='column
         pd.DataFrame([(c, int(k), v) for c, d in M['categorical'].items() for k, v in d.items()],
                      columns=['column_name', 'code', 'label']).to_sql('category_labels', con, index=False)
         pd.DataFrame([(int(k), v) for k, v in M['geographic'].items()], columns=['code', 'label']).to_sql('place_labels', con, index=False)
+        con.execute('CREATE INDEX idx_catlabels ON category_labels(column_name, code)'); con.execute('CREATE INDEX idx_placelabels ON place_labels(code)')
+        for sql in _readable_views(list(base.columns), set(M['categorical'])).values(): con.execute(sql)
     con.commit(); con.close()
     return path
 
