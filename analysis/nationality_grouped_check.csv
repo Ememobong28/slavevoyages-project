@@ -1,0 +1,7 @@
+split,features,n_test,accuracy,macro_f1
+random rows (ships can repeat),all features,3878,0.96,0.636
+random rows (ships can repeat),no port/place/region,3878,0.888,0.508
+random rows (ships can repeat),PORTDEP only,3878,0.691,0.323
+whole ships held out,all features,3642,0.965,0.629
+whole ships held out,no port/place/region,3642,0.886,0.444
+whole ships held out,PORTDEP only,3642,0.69,0.356
