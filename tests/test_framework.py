@@ -99,6 +99,16 @@ def test_readable_views():
     assert nulls == int(BASE['NATIONAL'].isna().sum()), 'missing must stay missing, not become a label'
     ok('readable views: same rows, label counts equal code counts, undefined codes are flagged, missing stays NULL')
 
+def test_relative_error_metrics():
+    t = get_task(BASE, 'TONNAGE', 'real', 'random', 0.7)
+    truth = np.expm1(t.y_test)
+    r = evaluate.score(t, t.y_test, np.log1p(truth * 1.05))              # every guess exactly 5% too big
+    assert abs(r['median_APE_pct'] - 5) < 1e-6 and abs(r['MAPE_pct'] - 5) < 1e-6
+    assert r['within_10_pct'] == 1.0 and r['within_25_pct'] == 1.0
+    r2 = evaluate.score(t, t.y_test, np.log1p(truth * 2.0))              # every guess twice the truth = 100% off
+    assert abs(r2['median_APE_pct'] - 100) < 1e-6 and r2['within_50_pct'] == 0.0
+    ok('percent-error metrics: a 5% miss reads 5%, a doubled guess reads 100%, thresholds count correctly')
+
 if __name__ == '__main__':
     for n, f in list(globals().items()):
         if n.startswith('test_'): f()

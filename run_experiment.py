@@ -7,31 +7,47 @@ run_experiment.py -- run any registered models on a target and compare them.
 Or from Python:  from run_experiment import run ; run('TONNAGE', mode='real', train_frac=0.5)
 """
 import argparse, os, time
-import pandas as pd
+import numpy as np, pandas as pd
 import voyage_db, models
 from evaluate import get_task, check_integrity, SPECS
 from models import REGISTRY
 from evaluate import score
 
 def run(target, mode='real', scheme='random', train_frac=0.70, seed=42, model_names=None, csv='tastdb-exp-2019.csv', base=None, outdir=None):
+    """Run the models once. With outdir set, also saves the per-voyage predictions (one file per run)."""
     base = base if base is not None else voyage_db.read_base(csv)
     task = get_task(base, target, mode, scheme, train_frac, seed); check_integrity(task)
     names = model_names or [n for n, r in REGISTRY.items() if task.spec.kind in r['kinds']]
-    rows = []
+    rows = []; preds = {}
     for n in names:
         if n not in REGISTRY: raise KeyError(f'unknown model {n!r}; available: {sorted(REGISTRY)}')
         if task.spec.kind not in REGISTRY[n]['kinds']: continue
         t0 = time.time(); out = REGISTRY[n]['fn'](task)
         pred, params = out if isinstance(out, tuple) else (out, '')
-        r = score(task, task.y_test, pred)
+        preds[n] = np.asarray(pred); r = score(task, task.y_test, pred)
         r.update(target=target, mode=mode, split=scheme, train_frac=train_frac, seed=seed, model=n, n_train=len(task.y_train),
                  settings=params, seconds=round(time.time() - t0, 1))
         rows.append(r)
     res = pd.DataFrame(rows)
     if outdir:
         os.makedirs(outdir, exist_ok=True)
-        res.to_csv(f'{outdir}/results_{target}_{mode}_{scheme}_{int(train_frac*100)}.csv', index=False)
+        tag = f'{target}_{mode}_{scheme}_{int(train_frac*100)}_seed{seed}'
+        res.to_csv(f'{outdir}/results_{tag}.csv', index=False)
+        truth = task.y_test.copy()
+        if task.spec.log_target: truth = np.expm1(truth)          # report tons, not log tons
+        out = pd.DataFrame({'VOYAGEID': task.meta.loc[task.y_test.index, 'VOYAGEID'].values, 'y_true': truth.values})
+        for n, p in preds.items(): out[n] = np.expm1(p) if task.spec.log_target else p
+        out.to_csv(f'{outdir}/predictions_{tag}.csv', index=False)
     return res, task
+
+def run_seeds(target, n_seeds=5, first_seed=42, **kw):
+    """Repeat run() with different random splits. Returns every run and a mean +/- sd summary per model."""
+    allr = [run(target, seed=first_seed + i, **kw)[0] for i in range(n_seeds)]
+    allr = pd.concat(allr, ignore_index=True)
+    num = allr.select_dtypes('number').drop(columns=['seed', 'n_train'], errors='ignore')
+    g = num.groupby(allr['model'], sort=False)
+    summ = g.mean().add_suffix('_mean').join(g.std().add_suffix('_sd'))
+    return allr, summ
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
@@ -40,9 +56,17 @@ if __name__ == '__main__':
     ap.add_argument('--scheme', default='random', choices=['random', 'temporal'])
     ap.add_argument('--train-frac', type=float, default=0.70)
     ap.add_argument('--seed', type=int, default=42)
+    ap.add_argument('--seeds', type=int, default=1, help='repeat with this many different random splits and report mean and sd')
     ap.add_argument('--models', default=None, help='comma list; default = all registered for this target type')
     ap.add_argument('--csv', default='tastdb-exp-2019.csv', help='the original csv OR the voyages.sqlite built by voyage_db.py'); ap.add_argument('--out', default='results')
     a = ap.parse_args()
-    res, task = run(a.target, a.mode, a.scheme, a.train_frac, a.seed, a.models.split(',') if a.models else None, a.csv, outdir=a.out)
-    for n in task.notes: print('NOTE:', n)
-    print(res.drop(columns=['seed']).round(3).to_string(index=False))
+    names = a.models.split(',') if a.models else None
+    if a.seeds > 1:
+        allr, summ = run_seeds(a.target, a.seeds, a.seed, mode=a.mode, scheme=a.scheme, train_frac=a.train_frac, model_names=names, csv=a.csv, outdir=a.out)
+        os.makedirs(a.out, exist_ok=True); allr.to_csv(f'{a.out}/runs_{a.target}_{a.mode}_{a.scheme}_{int(a.train_frac*100)}.csv', index=False)
+        summ.to_csv(f'{a.out}/summary_{a.target}_{a.mode}_{a.scheme}_{int(a.train_frac*100)}.csv')
+        print(summ.round(3).T.to_string())
+    else:
+        res, task = run(a.target, a.mode, a.scheme, a.train_frac, a.seed, names, a.csv, outdir=a.out)
+        for n in task.notes: print('NOTE:', n)
+        print(res.drop(columns=['seed']).round(3).to_string(index=False))

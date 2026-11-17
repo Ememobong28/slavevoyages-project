@@ -1,0 +1,17 @@
+predictors,split,model,median_pct_error,within_10,within_25,within_50,MAE_tons,median_pct_sd
+recorded values only (real mode),random,median guess,39.72,0.129,0.278,0.609,74.346,1.824
+recorded values only (real mode),random,tree,20.022,0.307,0.58,0.825,43.244,0.251
+recorded values only (real mode),random,gradient_boosting,16.979,0.319,0.645,0.875,36.869,0.421
+recorded values only (real mode),random,random_forest,16.571,0.356,0.643,0.873,36.774,0.227
+recorded values only (real mode),temporal,median guess,36.364,0.146,0.335,0.699,67.642,0.0
+recorded values only (real mode),temporal,tree,52.422,0.093,0.242,0.478,93.448,0.0
+recorded values only (real mode),temporal,gradient_boosting,49.774,0.105,0.261,0.503,97.183,0.0
+recorded values only (real mode),temporal,random_forest,55.312,0.095,0.241,0.458,101.243,0.0
+imputed values filled in (imputed mode),random,median guess,39.72,0.129,0.278,0.609,74.346,1.824
+imputed values filled in (imputed mode),random,tree,19.971,0.297,0.574,0.827,43.331,0.544
+imputed values filled in (imputed mode),random,gradient_boosting,17.067,0.32,0.648,0.877,36.862,0.287
+imputed values filled in (imputed mode),random,random_forest,16.503,0.357,0.645,0.874,36.495,0.337
+imputed values filled in (imputed mode),temporal,median guess,36.364,0.146,0.335,0.699,67.642,0.0
+imputed values filled in (imputed mode),temporal,tree,77.522,0.074,0.191,0.346,135.348,0.0
+imputed values filled in (imputed mode),temporal,gradient_boosting,58.733,0.093,0.235,0.438,111.616,0.0
+imputed values filled in (imputed mode),temporal,random_forest,71.662,0.084,0.194,0.378,122.721,0.0

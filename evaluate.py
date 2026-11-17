@@ -14,11 +14,28 @@ from dataclasses import dataclass, field
 import warnings
 import numpy as np, pandas as pd
 from sklearn.model_selection import train_test_split
-from eval_pipeline import score, baseline_features   # same metrics + feature list as before
+from eval_pipeline import score as _base_score, baseline_features   # metrics + feature list from v1
 import voyage_db
 
 SEED = 42
 MIN_TRAIN = 30   # fewer known training values than this -> refuse, results would be noise
+
+REL_THRESHOLDS = (10, 25, 50)   # "within X% of the true value", reported for numeric targets
+
+def score(task, y_true, y_pred, subset=None):
+    """v1 metrics, plus RELATIVE error for numeric targets so it can be read next to accuracy.
+    For tonnage: the model works on log1p(tons); we convert back to tons before computing percent errors.
+      median_APE_pct : the typical miss as a percent of the true tonnage
+      MAPE_pct       : mean percent miss (pulled up by very small ships, so read it with the median)
+      within_10_pct  : share of voyages predicted within 10% of the true tonnage (also 25, 50). Read like an accuracy."""
+    r = _base_score(task, y_true, y_pred, subset)
+    if task.spec.kind == 'regression':
+        yt, yp = np.asarray(y_true, float), np.asarray(y_pred, float)
+        if task.spec.log_target: yt, yp = np.expm1(yt), np.expm1(yp)
+        ape = 100 * np.abs(yp - yt) / yt
+        r['median_APE_pct'] = float(np.median(ape)); r['MAPE_pct'] = float(ape.mean())
+        for t in REL_THRESHOLDS: r[f'within_{t}_pct'] = float((ape <= t).mean())
+    return r
 
 @dataclass
 class TargetSpec:

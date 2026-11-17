@@ -16,7 +16,7 @@ git clone https://github.com/Ememobong28/slavevoyages-project && cd slavevoyages
 pip install -r requirements.txt
 # put tastdb-exp-2019.csv in this folder (see DATA.md)
 python voyage_db.py sqlite tastdb-exp-2019.csv voyages.sqlite     # build the database (about 20 MB)
-python tests/test_framework.py                                    # 9 checks
+python tests/test_framework.py                                    # 10 checks
 python run_experiment.py --csv voyages.sqlite --target NATIONAL_GROUP --mode real --train-frac 0.5
 ```
 
