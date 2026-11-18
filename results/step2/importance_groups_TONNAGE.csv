@@ -1,0 +1,9 @@
+,worse_when_shuffled_mean,sd_across_splits,score_when_group_removed_retrained
+Captives (numbers),14.454,0.418,21.73
+"Ship size and type (rig, tonnage, guns)",9.794,0.522,17.914
+Year of the voyage,9.331,0.527,19.013
+Departure and purchase ports/regions,3.671,0.497,17.303
+"Ship build and registration (year, place)",1.826,0.111,17.114
+Landing and return ports/regions,1.554,0.194,16.677
+Nationality of the ship,0.57,0.011,17.275
+Voyage outcome (FATE2/3/4),0.163,0.103,17.293

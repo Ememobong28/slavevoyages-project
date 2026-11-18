@@ -1,0 +1,2 @@
+n,MAE_tons,RMSE_tons,MAE_log,median_abs_err_tons,median_APE_pct,MAPE_pct,within_10_pct,within_25_pct,within_50_pct,target,mode,split,train_frac,seed,model,n_train,settings,seconds
+2651,85.69926069163674,112.69340213355133,0.5210324039656562,67.5581298295503,46.43633891063755,70.04134600734822,0.1003394945303659,0.2776310826103357,0.5292342512259525,TONNAGE,real,temporal,0.7,45,tabpfn,12368,default settings,23.5

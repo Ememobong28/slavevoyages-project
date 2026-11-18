@@ -33,6 +33,7 @@ def _tune(task, make, grid, X=lambda d: d):
         s = score(task, task.y_val, m.predict(X(task.X_val)))[key]
         if best is None or (s > best[0] if clf else s < best[0]): best = (s, p)
     m = make(**best[1]).fit(X(task.X_train), ytr)
+    task.fitted = m                      # kept so analysis scripts can inspect the chosen model
     return m.predict(X(task.X_test)), str(best[1])
 
 @register('majority_or_median')

@@ -1,0 +1,8 @@
+,worse_when_shuffled_mean,sd_across_splits,score_when_group_removed_retrained
+Departure and purchase ports/regions,32.654,2.952,93.924
+Year of the voyage,13.379,0.466,94.451
+Landing and return ports/regions,7.119,0.301,95.129
+"Ship size and type (rig, tonnage, guns)",0.951,0.093,95.757
+Captives (numbers),0.844,0.459,96.033
+"Ship build and registration (year, place)",0.639,0.122,95.556
+Voyage outcome (FATE2/3/4),0.258,0.065,95.657

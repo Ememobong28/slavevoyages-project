@@ -15,3 +15,5 @@ imputed values filled in (imputed mode),temporal,median guess,36.364,0.146,0.335
 imputed values filled in (imputed mode),temporal,tree,77.522,0.074,0.191,0.346,135.348,0.0
 imputed values filled in (imputed mode),temporal,gradient_boosting,58.733,0.093,0.235,0.438,111.616,0.0
 imputed values filled in (imputed mode),temporal,random_forest,71.662,0.084,0.194,0.378,122.721,0.0
+recorded values only (real mode),random,tabpfn,14.40269956778718,0.3990946812523576,0.6916635231987929,0.8991324028668426,32.05430502462637,0.3648067127901769
+recorded values only (real mode),temporal,tabpfn,46.43633891063755,0.1003394945303659,0.2776310826103357,0.5292342512259525,85.69926069163674,0.0
