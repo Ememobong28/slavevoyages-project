@@ -12,7 +12,7 @@ NATINIMP is the dataset's own imputed nationality, in 8 coarse groups. Recorded 
 | Imputed only (recorded blank) | 7,377 |
 | Neither | 2,161 |
 
-- **Where both exist, the imputed column is a copy** (coarser groups) of the recorded one, apart from 2 voyages (`copy_check_disagreements.csv`: voyage 1603, 1837, recorded code 4 vs imputed 15; voyage 33916, 1648, recorded 8 vs imputed 10).
+- **Where both exist, the imputed column is a copy** (coarser groups) of the recorded one, apart from 2 voyages (`copy_check_disagreements.csv`: voyage 1603 (1837) is recorded Portugal but imputed Denmark/Baltic; voyage 33916 (1648) is recorded Netherlands but imputed France).
 - So it adds information only for the **7,377 voyages with no recorded nationality**. We can't test those values against a recorded truth, because none exists. That is why the comparison below is only agreement, not accuracy.
 - Open question for the professor / the dataset's maintainers: how were those 7,377 values made (a rule, a person, or a model)?
 
