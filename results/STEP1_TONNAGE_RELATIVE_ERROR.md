@@ -13,12 +13,12 @@ Tonnage ranges from 10 to 1,667 tons (median 129). An error of 17 tons means lit
 | Random | Decision tree | 20.0 | 30.7% | 58.0% | 82.5% | 43.2 |
 | Random | Gradient boosting | 17.0 | 31.9% | 64.5% | 87.5% | 36.9 |
 | Random | Random forest | 16.6 | 35.6% | 64.3% | 87.3% | 36.8 |
-| Random | TabPFN | 14.4 | see csv | 69.2% | see csv | 32.1 |
+| Random | TabPFN | 14.4 | 39.9% | 69.2% | 89.9% | 32.1 |
 | Time-based | Median guess | 36.4 | 14.6% | 33.5% | 69.9% | 67.6 |
 | Time-based | Decision tree | 52.4 | 9.3% | 24.2% | 47.8% | 93.4 |
 | Time-based | Gradient boosting | 49.8 | 10.5% | 26.1% | 50.3% | 97.2 |
 | Time-based | Random forest | 55.3 | 9.5% | 24.1% | 45.8% | 101.2 |
-| Time-based | TabPFN | 46.4 | see csv | 27.8% | see csv | 85.7 |
+| Time-based | TabPFN | 46.4 | 10.0% | 27.8% | 52.9% | 85.7 |
 
 (Predictors: recorded values only. The same table with imputed values filled in is in `tonnage_relative_error_table.csv`.)
 
