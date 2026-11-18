@@ -1,0 +1,11 @@
+rule,pairs,nat_pairs,same_nationality_pct,ton_pairs,median_ton_diff_pct,voyages_with_a_link_pct,missing_nat_with_known_neighbour_pct,missing_ton_with_known_neighbour_pct
+random pair (baseline),199996,108260,26.6,48102,55.0,,,
+same ship name,138916,86152,84.2,56428,33.3,80.9,61.5,35.3
+"same ship name, within 10 years",63187,39029,92.0,26071,10.5,70.4,45.4,19.8
+"same ship name, within 30 years",101849,61972,88.2,41561,23.4,77.0,55.1,28.2
+same captain (first captain),47585,33024,97.3,23919,30.0,57.0,29.7,12.7
+"same captain, within 10 years",34470,24290,98.8,17786,22.8,53.0,24.2,8.7
+same owner (first owner),81638,65011,99.0,54162,33.3,46.6,18.5,9.4
+"same owner, within 10 years",66578,52094,99.0,44007,30.2,44.3,17.0,8.1
+same departure port,18490,10191,89.1,5846,48.2,26.0,16.4,11.9
+"same departure port, within 5 years",5568,3331,92.8,2332,40.4,9.5,4.6,3.0
