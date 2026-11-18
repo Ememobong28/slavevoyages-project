@@ -1,5 +1,6 @@
 # GraphPFN needs Python 3.11+, a CUDA GPU, and an older PyTorch. In Colab use the notebook, which runs these in order:
-#   pip install "torch==2.4" --index-url https://download.pytorch.org/whl/cu118
-#   pip install dgl -f https://data.dgl.ai/wheels/torch-2.4/cu118/repo.html
-#   pip install graphpfn
+#   uv venv --python 3.11 gp311   (Colab now has Python 3.13, which GraphPFN cannot use)
+#   uv pip install --python gp311/bin/python "torch==2.4.1" --index-url https://download.pytorch.org/whl/cu118
+#   uv pip install --python gp311/bin/python dgl -f https://data.dgl.ai/wheels/torch-2.4/cu118/repo.html
+#   uv pip install --python gp311/bin/python graphpfn
 graphpfn
