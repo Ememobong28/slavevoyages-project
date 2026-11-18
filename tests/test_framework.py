@@ -109,6 +109,27 @@ def test_relative_error_metrics():
     assert abs(r2['median_APE_pct'] - 100) < 1e-6 and r2['within_50_pct'] == 0.0
     ok('percent-error metrics: a 5% miss reads 5%, a doubled guess reads 100%, thresholds count correctly')
 
+def test_graph_inputs():
+    import voyage_graph
+    for g in voyage_graph.RULES:
+        src, dst = voyage_graph.build_edges(BASE, g)
+        assert len(src) == len(dst) and (src != dst).all(), 'no self links'
+        fwd = set(zip(src.tolist(), dst.tolist())); assert all((b, a) in fwd for a, b in fwd), 'links must go both ways'
+    s, d = voyage_graph.build_edges(BASE, 'ship10'); yr = BASE['YEARDEP'].values
+    assert (abs(yr[s] - yr[d]) <= 10).all(), 'ship10 must never link voyages more than 10 years apart'
+    nm = BASE['SHIPNAME'].astype('string').str.strip().str.upper().values
+    assert (nm[s] == nm[d]).all(), 'ship links must join the same name'
+    assert len(voyage_graph.build_edges(BASE, 'none')[0]) == 0
+    for target in ('TONNAGE', 'NATIONAL_GROUP'):
+        gi = voyage_graph.graph_inputs(BASE, target, 'real', 'random', 0.7, 42, 'ship10')
+        m, t = gi['masks'], gi['targets']
+        assert not np.isfinite(t[m['test']]).any(), 'test targets must be hidden from the graph model'
+        assert np.isfinite(t[m['train']]).all()
+        assert not (m['train'] & m['test']).any() and not (m['train'] & m['val']).any() and not (m['val'] & m['test']).any()
+        t2 = get_task(BASE, target, 'real', 'random', 0.7, 42)
+        assert m['test'].sum() == len(t2.y_test) and m['train'].sum() == len(t2.y_train), 'same split as the other models'
+    ok('graph inputs: links are symmetric, respect the year window and the ship name, test targets are hidden, same split as other models')
+
 if __name__ == '__main__':
     for n, f in list(globals().items()):
         if n.startswith('test_'): f()

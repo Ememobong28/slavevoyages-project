@@ -91,8 +91,9 @@ results/ and analysis/       tables, figures and short written findings (steps 1
 | `evaluate.py` | splits, leakage rules, integrity checks | to change the test |
 | `models.py` | the model registry | to add or change a model |
 | `run_experiment.py` | runs and compares models | to reproduce results |
-| `tests/` | 10 checks the framework must keep passing | after any change |
-| `notebooks/` | the Colab notebook for TabPFN | to run TabPFN |
+| `tests/` | 11 checks the framework must keep passing | after any change |
+| `voyage_graph.py`, `graphpfn_run.py` | links between voyages, and the GraphPFN runner | to try GraphPFN |
+| `notebooks/` | Colab notebooks for TabPFN and GraphPFN | to run them on a GPU |
 | `column_audit_276.csv`, `codebook_maps.json` | what we decided for each of the 276 columns; code-to-name labels from the codebook | to see why a column is used or left out |
 | `analysis/` | scripts and notes behind the findings | to see how a finding was produced |
 | `results/` | the outputs, one folder per step | to see the numbers |
@@ -107,6 +108,8 @@ results/ and analysis/       tables, figures and short written findings (steps 1
 | 3. Why tonnage is hard | Where is the error (ship size, period, missing records)? | `results/step3/` |
 | 4. Imputed vs model | Is the imputed nationality a copy, and does the model agree? | `results/step4/` |
 
+Link analysis for GraphPFN (which links between voyages are informative): `results/graph/GRAPH_LINKS.md`.
+
 Each folder has a written note (`STEP*.md`), the numbers as CSV, and figures.
 
 ---
@@ -117,7 +120,7 @@ git clone https://github.com/Ememobong28/slavevoyages-project && cd slavevoyages
 pip install -r requirements.txt
 # put tastdb-exp-2019.csv in this folder (see DATA.md)
 python voyage_db.py sqlite tastdb-exp-2019.csv voyages.sqlite     # build the database (about 20 MB)
-python tests/test_framework.py                                    # 10 checks
+python tests/test_framework.py                                    # 11 checks
 python run_experiment.py --csv voyages.sqlite --target NATIONAL_GROUP --mode real --train-frac 0.5
 ```
 Targets so far: `NATIONAL` (20 nationalities), `NATIONAL_GROUP` (the 8 coarser groups the authors use) and `TONNAGE`. Useful options: `--mode real|imputed`, `--scheme random|temporal`, `--train-frac 0.7`, `--seeds 5`, `--models tree,gradient_boosting,random_forest`.
@@ -128,6 +131,9 @@ python analysis/step2_feature_importance.py --csv voyages.sqlite --out results/s
 python analysis/step3_tonnage_why.py        --csv voyages.sqlite --out results/step3
 python analysis/step4_imputed_comparison.py --csv voyages.sqlite --out results/step4
 ```
+
+### Try GraphPFN
+GraphPFN treats voyages as nodes in a graph. Open `notebooks/run_graphpfn_colab.ipynb` in Colab (GPU). It needs Python 3.11+ and an older PyTorch; the notebook installs both. See `results/graph/GRAPH_LINKS.md` for why the default links are what they are.
 
 ### Try TabPFN
 Open `notebooks/run_tabpfn_colab.ipynb` in Google Colab (GPU runtime). Locally: `pip install -r requirements-tabpfn.txt`, set `TABPFN_TOKEN`, then add `tabpfn` to `--models`.
